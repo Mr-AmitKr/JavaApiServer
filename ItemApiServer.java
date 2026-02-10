@@ -56,26 +56,19 @@ public class ItemApiServer {
             String method = exchange.getRequestMethod();
             String path = exchange.getRequestURI().getPath();
 
-            // Log exactly what the server sees to Render Logs
-            System.out.println("LOG: Method=" + method + " | Path=" + path);
+            // Normalize path for the comparison
+            String cleanPath = path.endsWith("/") && path.length() > 1
+                    ? path.substring(0, path.length() - 1)
+                    : path;
 
-            // Normalize path: Remove trailing slashes and handle empty paths
-            if (path.endsWith("/") && path.length() > 1) {
-                path = path.substring(0, path.length() - 1);
-            }
-
-            // This covers "/", "/items", and the Render health checks
-            if (method.equals("GET") && (path.equals("/") || path.endsWith("/items") || path.endsWith("/items/"))) {
-                sendResponse(exchange, 200, "{\"status\":\"API Running\",\"message\":\"Welcome to the Item API\"}");
-                return; // Stop processing once response is sent
-            } // Inside your handle method
-            else if (method.equals("POST") && (path.equals("/items") || path.equals("/items/"))) {
+            if (method.equals("GET") && (cleanPath.equals("/") || cleanPath.equals("/items"))) {
+                sendResponse(exchange, 200, "{\"status\":\"API Running\"}");
+            } else if (method.equals("POST") && cleanPath.equals("/items")) {
                 handleAddItem(exchange);
-            } else if (method.equals("GET") && path.startsWith("/items/")) {
+            } else if (method.equals("GET") && cleanPath.startsWith("/items/")) {
                 handleGetItem(exchange);
             } else {
-                String errorMsg = String.format("{\"error\":\"Not Found\",\"debug_path\":\"%s\"}", path);
-                sendResponse(exchange, 404, errorMsg);
+                sendResponse(exchange, 404, "{\"error\":\"Not Found\",\"path\":\"" + path + "\"}");
             }
         }
 
