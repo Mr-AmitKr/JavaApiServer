@@ -1,28 +1,20 @@
- HOW TO RUN
- * 1. Compile: javac ItemApiServer.java
- * 2. Run: java ItemApiServer
- * 3. Server URL: http://localhost:8000
- * 
- * API ENDPOINTS
- * 1) Add Item
- * POST /items
- * Body JSON:
- * {
- * "name": "Laptop",
- * "description": "Gaming Laptop"
- * }
- * 
- * 2) Get Item By ID
- * GET /items/{id}
- * Example: GET /items/1
- * 
- * INPUT VALIDATION
- * - name field is required and must not be empty
- * - description is optional
- * 
- * IMPLEMENTATION DETAILS
- * - In-memory storage using ArrayList<Item>
- * - No external libraries required
- * - Uses built-in com.sun.net.httpserver.HttpServer
- * =====================================================
- */
+# Simple Java REST API
+
+## How to run locally
+
+1. Compile  
+   javac ItemApiServer.java
+
+2. Run  
+   java ItemApiServer
+
+Server starts at: http://localhost:8000
+
+## API Endpoints
+
+POST /items  
+- Add new item  
+Body: { "name": "", "description": "" }
+
+GET /items/{id}  
+- Get item by ID
