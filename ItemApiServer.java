@@ -65,8 +65,10 @@ public class ItemApiServer {
                 path = path.substring(0, path.length() - 1);
             }
 
-            if (method.equals("GET") && (path.equals("") || path.equals("/") || path.equals("/items"))) {
-                sendResponse(exchange, 200, "{\"status\":\"API Running\",\"message\":\"Welcome to the Item API\"}");
+           // This covers "/", "/items", and the Render health checks
+if (method.equals("GET") && (path.equals("/") || path.endsWith("/items") || path.endsWith("/items/"))) {
+    sendResponse(exchange, 200, "{\"status\":\"API Running\",\"message\":\"Welcome to the Item API\"}");
+    return; // Stop processing once response is sent
             } else if (method.equals("POST") && path.equals("/items")) {
                 handleAddItem(exchange);
             } else if (method.equals("GET") && path.startsWith("/items/")) {
