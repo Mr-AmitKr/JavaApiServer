@@ -41,7 +41,7 @@ public class ItemApiServer {
 
         System.out.println("STEP 2 - Bind successful");
 
-        server.createContext("/items", new ItemsHandler());
+        server.createContext("/", new ItemsHandler());
 
         server.setExecutor(null);
 
@@ -56,11 +56,9 @@ public class ItemApiServer {
         public void handle(HttpExchange exchange) throws IOException {
             String method = exchange.getRequestMethod();
             String path = exchange.getRequestURI().getPath();
-            if (method.equals("GET") && path.equals("/")) {
-                sendResponse(exchange, 200,
-                        "{\"status\":\"API Running\",\"endpoints\":[\"POST /items\",\"GET /items/{id}\"]}");
-            }
-            else if (method.equals("POST") && path.equals("/items")) {
+            if (method.equals("GET") && (path.equals("/") || path.equals("/items"))) {
+                sendResponse(exchange, 200, "{\"status\":\"API Running\"}");
+            } else if (method.equals("POST") && path.equals("/items")) {
                 handleAddItem(exchange);
             } else if (method.equals("GET") && path.matches("/items/\\d+")) {
                 handleGetItem(exchange);
