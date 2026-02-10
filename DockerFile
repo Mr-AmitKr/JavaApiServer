@@ -1,11 +1,6 @@
-FROM openjdk:17
-
+FROM eclipse-temurin:17
 WORKDIR /app
-
 COPY . .
-
 RUN javac ItemApiServer.java
-
-CMD ["java", "ItemApiServer"]
-
 EXPOSE 8000
+CMD ["java", "ItemApiServer"]
