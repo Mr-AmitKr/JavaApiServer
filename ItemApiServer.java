@@ -68,7 +68,8 @@ public class ItemApiServer {
             if (method.equals("GET") && (path.equals("/") || path.endsWith("/items") || path.endsWith("/items/"))) {
                 sendResponse(exchange, 200, "{\"status\":\"API Running\",\"message\":\"Welcome to the Item API\"}");
                 return; // Stop processing once response is sent
-            } else if (method.equals("POST") && path.equals("/items")) {
+            } // Inside your handle method
+            else if (method.equals("POST") && (path.equals("/items") || path.equals("/items/"))) {
                 handleAddItem(exchange);
             } else if (method.equals("GET") && path.startsWith("/items/")) {
                 handleGetItem(exchange);
