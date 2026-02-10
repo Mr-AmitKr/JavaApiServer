@@ -32,24 +32,23 @@ public class ItemApiServer {
     static List<Item> items = new ArrayList<>();
     static int idCounter = 1;
 
-public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-    System.out.println("STEP 1 - Program started");
+        System.out.println("STEP 1 - Program started");
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8000"));
 
-    HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", 8000), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", port), 0);
 
+        System.out.println("STEP 2 - Bind successful");
 
-    System.out.println("STEP 2 - Bind successful");
+        server.createContext("/items", new ItemsHandler());
 
-    server.createContext("/items", new ItemsHandler());
+        server.setExecutor(null);
 
-    server.setExecutor(null);
+        System.out.println("Server started at http://localhost:8000");
 
-    System.out.println("Server started at http://localhost:8000");
-
-    server.start();
-}
-
+        server.start();
+    }
 
     // ===== Handler =====
     static class ItemsHandler implements HttpHandler {
@@ -57,10 +56,13 @@ public static void main(String[] args) throws Exception {
         public void handle(HttpExchange exchange) throws IOException {
             String method = exchange.getRequestMethod();
             String path = exchange.getRequestURI().getPath();
-
-            if (method.equals("POST") && path.equals("/items")) {
+            if (method.equals("GET") && path.equals("/")) {
+                sendResponse(exchange, 200,
+                        "{\"status\":\"API Running\",\"endpoints\":[\"POST /items\",\"GET /items/{id}\"]}");
+            }
+            else if (method.equals("POST") && path.equals("/items")) {
                 handleAddItem(exchange);
-            } else if (method.equals("GET") && path.startsWith("/items/")) {
+            } else if (method.equals("GET") && path.matches("/items/\\d+")) {
                 handleGetItem(exchange);
             } else {
                 sendResponse(exchange, 404, "{\"error\":\"Not Found\"}");

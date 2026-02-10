@@ -13,8 +13,14 @@ Server starts at: http://localhost:8000
 ## API Endpoints
 
 POST /items  
-- Add new item  
-Body: { "name": "", "description": "" }
+- Add new item  -
+Invoke-RestMethod -Method Post `
+-Uri "http://localhost:8000/items" `
+-ContentType "application/json" `
+-Body '{"name":"Phone","description":"Samsung"}'
+
 
 GET /items/{id}  
 - Get item by ID
+Invoke-RestMethod -Method Get -Uri "http://localhost:8000/items/ID"
+
