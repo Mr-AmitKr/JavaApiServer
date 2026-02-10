@@ -57,25 +57,23 @@ public class ItemApiServer {
             String method = exchange.getRequestMethod();
             String path = exchange.getRequestURI().getPath();
 
-            // Log the request to Render logs so you can see what's happening
-            System.out.println("Received " + method + " request at " + path);
+            // Log exactly what the server sees to Render Logs
+            System.out.println("LOG: Method=" + method + " | Path=" + path);
 
-            // 1. Root or /items (Welcome Message)
-            if (method.equals("GET") && (path.equals("/") || path.equals("/items") || path.equals("/items/"))) {
-                sendResponse(exchange, 200,
-                        "{\"status\":\"API Running\",\"endpoints\":[\"POST /items\",\"GET /items/{id}\"]}");
+            // Normalize path: Remove trailing slashes and handle empty paths
+            if (path.endsWith("/") && path.length() > 1) {
+                path = path.substring(0, path.length() - 1);
             }
-            // 2. POST to /items (Add Item)
-            else if (method.equals("POST") && (path.equals("/items") || path.equals("/items/"))) {
+
+            if (method.equals("GET") && (path.equals("") || path.equals("/") || path.equals("/items"))) {
+                sendResponse(exchange, 200, "{\"status\":\"API Running\",\"message\":\"Welcome to the Item API\"}");
+            } else if (method.equals("POST") && path.equals("/items")) {
                 handleAddItem(exchange);
-            }
-            // 3. GET /items/{id} (Regex matches /items/ followed by numbers)
-            else if (method.equals("GET") && path.matches("/items/\\d+")) {
+            } else if (method.equals("GET") && path.startsWith("/items/")) {
                 handleGetItem(exchange);
-            }
-            // 4. Everything else
-            else {
-                sendResponse(exchange, 404, "{\"error\":\"Not Found\",\"requested_path\":\"" + path + "\"}");
+            } else {
+                String errorMsg = String.format("{\"error\":\"Not Found\",\"debug_path\":\"%s\"}", path);
+                sendResponse(exchange, 404, errorMsg);
             }
         }
 
