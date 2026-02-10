@@ -33,21 +33,20 @@ public class ItemApiServer {
     static int idCounter = 1;
 
     public static void main(String[] args) throws Exception {
+        // 1. Get port from environment variable, default to 8000 for local testing
+        String portStr = System.getenv("PORT");
+        int port = (portStr != null) ? Integer.parseInt(portStr) : 8000;
 
-        System.out.println("STEP 1 - Program started");
-        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8000"));
+        System.out.println("Starting server on port: " + port);
 
+        // 2. Bind to 0.0.0.0 (required for cloud) instead of localhost
         HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", port), 0);
 
-        System.out.println("STEP 2 - Bind successful");
-
         server.createContext("/", new ItemsHandler());
-
         server.setExecutor(null);
-
-        System.out.println("Server started at http://localhost:8000");
-
         server.start();
+
+        System.out.println("Server is live!");
     }
 
     // ===== Handler =====
@@ -65,10 +64,10 @@ public class ItemApiServer {
                 path = path.substring(0, path.length() - 1);
             }
 
-           // This covers "/", "/items", and the Render health checks
-if (method.equals("GET") && (path.equals("/") || path.endsWith("/items") || path.endsWith("/items/"))) {
-    sendResponse(exchange, 200, "{\"status\":\"API Running\",\"message\":\"Welcome to the Item API\"}");
-    return; // Stop processing once response is sent
+            // This covers "/", "/items", and the Render health checks
+            if (method.equals("GET") && (path.equals("/") || path.endsWith("/items") || path.endsWith("/items/"))) {
+                sendResponse(exchange, 200, "{\"status\":\"API Running\",\"message\":\"Welcome to the Item API\"}");
+                return; // Stop processing once response is sent
             } else if (method.equals("POST") && path.equals("/items")) {
                 handleAddItem(exchange);
             } else if (method.equals("GET") && path.startsWith("/items/")) {
