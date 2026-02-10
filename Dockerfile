@@ -1,6 +1,7 @@
-FROM eclipse-temurin:17
+FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY . .
+COPY ItemApiServer.java .
 RUN javac ItemApiServer.java
-EXPOSE 8000
+# Render will override this EXPOSE, but it's good practice
+EXPOSE 8000 
 CMD ["java", "ItemApiServer"]
