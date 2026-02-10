@@ -56,14 +56,26 @@ public class ItemApiServer {
         public void handle(HttpExchange exchange) throws IOException {
             String method = exchange.getRequestMethod();
             String path = exchange.getRequestURI().getPath();
-            if (method.equals("GET") && (path.equals("/") || path.equals("/items"))) {
-                sendResponse(exchange, 200, "{\"status\":\"API Running\"}");
-            } else if (method.equals("POST") && path.equals("/items")) {
+
+            // Log the request to Render logs so you can see what's happening
+            System.out.println("Received " + method + " request at " + path);
+
+            // 1. Root or /items (Welcome Message)
+            if (method.equals("GET") && (path.equals("/") || path.equals("/items") || path.equals("/items/"))) {
+                sendResponse(exchange, 200,
+                        "{\"status\":\"API Running\",\"endpoints\":[\"POST /items\",\"GET /items/{id}\"]}");
+            }
+            // 2. POST to /items (Add Item)
+            else if (method.equals("POST") && (path.equals("/items") || path.equals("/items/"))) {
                 handleAddItem(exchange);
-            } else if (method.equals("GET") && path.matches("/items/\\d+")) {
+            }
+            // 3. GET /items/{id} (Regex matches /items/ followed by numbers)
+            else if (method.equals("GET") && path.matches("/items/\\d+")) {
                 handleGetItem(exchange);
-            } else {
-                sendResponse(exchange, 404, "{\"error\":\"Not Found\"}");
+            }
+            // 4. Everything else
+            else {
+                sendResponse(exchange, 404, "{\"error\":\"Not Found\",\"requested_path\":\"" + path + "\"}");
             }
         }
 
