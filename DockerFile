@@ -1,0 +1,6 @@
+FROM openjdk:17
+COPY . /app
+WORKDIR /app
+RUN javac ItemApiServer.java
+CMD ["java", "ItemApiServer"]
+EXPOSE 8000
